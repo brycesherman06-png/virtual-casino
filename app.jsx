@@ -9,50 +9,48 @@ function App() {
 
     let scene, camera, renderer, cube;
 
-    async function init() {
+    // Scene
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x050508);
 
-      const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js");
+    // Camera
+    camera = new THREE.PerspectiveCamera(
+      60,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.z = 5;
 
-      // Scene
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x050508);
+    // Renderer
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    mountRef.current.appendChild(renderer.domElement);
 
-      // Camera
-      camera = new THREE.PerspectiveCamera(
-        60,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        1000
-      );
-      camera.position.z = 5;
+    // Light
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1.2));
 
-      // Renderer
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      mountRef.current.appendChild(renderer.domElement);
+    const dir = new THREE.DirectionalLight(0xffffff, 1);
+    dir.position.set(5, 10, 5);
+    scene.add(dir);
 
-      // Light
-      scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1.2));
+    // Cube
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+    cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
 
-      // Spinning Cube (test object)
-      const geo = new THREE.BoxGeometry();
-      const mat = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-      cube = new THREE.Mesh(geo, mat);
-      scene.add(cube);
-
-      // Loop
-      function animate() {
-        requestAnimationFrame(animate);
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
-        renderer.render(scene, camera);
-      }
-
-      animate();
+    // Animate
+    function animate() {
+      requestAnimationFrame(animate);
+      cube.rotation.x += 0.01;
+      cube.rotation.y += 0.01;
+      renderer.render(scene, camera);
     }
 
-    init();
+    animate();
 
+    // Resize
     window.addEventListener("resize", () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
